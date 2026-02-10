@@ -23,13 +23,23 @@ public:
 	MyMathLibrary();
 	~MyMathLibrary();
 
+	/*2D Vector*/
 	static FMyVector2 Add2D(FMyVector2 a, FMyVector2 b);
 	static FMyVector2 Subtract2D(FMyVector2 a, FMyVector2 b);
 	static float Magnitude2D(FMyVector2 v);
 	static float Distance2D(FMyVector2 a, FMyVector2 b);
 
+	/*3D Vector*/
 	static FMyVector3 Add3D(FMyVector3 a, FMyVector3 b);
 	static FMyVector3 Subtract3D(FMyVector3 a, FMyVector3 b);
 	static float Magnitude3D(FMyVector3 v);
 	static float Distance3D(FMyVector3 a, FMyVector3 b);
+	static FMyVector3 Scale(FMyVector3 v, float s);
+	static FMyVector3 Divide(FMyVector3 v, float s);
+	static FMyVector3 Normalize(FMyVector3 v);
+	static float Dot(FMyVector3 a, FMyVector3 b);
+	static FMyVector3 ConvertToCustomVector(FVector3d a);
+	static FVector3d ConvertFromCustomVector(FMyVector3 a);
+	/*Helper functions*/
+	static FMyVector3 MoveStep(FMyVector3 Direction, float Speed, float DeltaTime);
 };

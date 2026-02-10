@@ -26,6 +26,23 @@ void ATestActor::BeginPlay()
 	UE_LOG(LogTemp, Warning, TEXT("%f, %f"), Sub.x,Sub.y);
 	UE_LOG(LogTemp, Warning, TEXT("%f"), Mag);
 	UE_LOG(LogTemp, Warning, TEXT("%f"), Dist);
+	UE_LOG(LogTemp, Warning, TEXT("--------------------------------------------"));
+	
+	FMyVector3 scale = MyMathLibrary::Scale(FMyVector3(2, -3, 1), 4);
+	FMyVector3 Divide = MyMathLibrary::Divide(FMyVector3(6, -2, 10),2);
+	FMyVector3 Normalize = MyMathLibrary::Normalize(FMyVector3(3, 4, 0));
+	float Dot = MyMathLibrary::Dot(FMyVector3(0, 1, 0), FMyVector3(0, 1, 0));
+	float Dot1 = MyMathLibrary::Dot(FMyVector3(0, 1, 0), FMyVector3(1, 0, 0));
+	float Dot2 = MyMathLibrary::Dot(FMyVector3(0, 1, 0), FMyVector3(0, -1, 0));
+	FMyVector3 Normalize0 = MyMathLibrary::Normalize(FMyVector3(0, 0, 0));
+	
+	UE_LOG(LogTemp, Warning, TEXT("Scale = %f,%f,%f"),scale.x,scale.y,scale.z);
+	UE_LOG(LogTemp, Warning, TEXT("Divide = %f,%f,%f"), Divide.x, Divide.y, Divide.z);
+	UE_LOG(LogTemp, Warning, TEXT("Normalize = %f,%f,%f"), Normalize.x, Normalize.y, Normalize.z);
+	UE_LOG(LogTemp, Warning, TEXT("%f"), Dot);
+	UE_LOG(LogTemp, Warning, TEXT("%f"), Dot1);
+	UE_LOG(LogTemp, Warning, TEXT("%f"), Dot2);
+	UE_LOG(LogTemp, Warning, TEXT("Normalize = %f,%f,%f"), Normalize0.x, Normalize0.y, Normalize0.z);
 }
 
 // Called every frame

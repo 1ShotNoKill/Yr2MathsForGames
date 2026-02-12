@@ -93,3 +93,43 @@ FMyVector3 MyMathLibrary::MoveStep(FMyVector3 Direction, float Speed, float Delt
 	FMyVector3 Vel = Scale(Dir, Speed); //units per second
 	return FMyVector3(Scale(Vel,DeltaTime)); //units per frame
 }
+
+float MyMathLibrary::DegreesToRadians(float Degrees)
+{
+	return (Degrees * (PI * 180));
+}
+
+float MyMathLibrary::RadiansToDegrees(float Radians)
+{
+	return (Radians * (180/PI));
+}
+
+float MyMathLibrary::AngleFromVector2(FMyVector2 v)
+{
+	
+	return atan2(v.y, v.x);
+}
+
+FMyVector2 MyMathLibrary::Vector2FromAngle(float Radians)
+{
+
+	return FMyVector2((cos(Radians)),sin(Radians));
+}
+
+FMyVector3 MyMathLibrary::ForwardFromYawPitch(float YawRadians, float PitchRadians)
+{
+	float Fx = sin(YawRadians) * cos(PitchRadians);
+	float Fy = sin(PitchRadians);
+	float Fz = cos(YawRadians) * cos(PitchRadians);
+		return FMyVector3(Fx,Fy,Fz);
+}
+
+FMyVector3 MyMathLibrary::CrossProduct(FMyVector3 a, FMyVector3 b)
+{
+	float Cx = (a.y * b.z) - (a.z * b.y);
+	float Cy = (a.z * b.x) - (a.x * b.z);
+	float Cz = (a.x * b.y) - (a.y * b.x);
+	return FMyVector3(Cx,Cy,Cz);
+}
+
+

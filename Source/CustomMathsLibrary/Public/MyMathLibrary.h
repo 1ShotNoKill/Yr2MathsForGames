@@ -42,4 +42,18 @@ public:
 	static FVector3d ConvertFromCustomVector(FMyVector3 a);
 	/*Helper functions*/
 	static FMyVector3 MoveStep(FMyVector3 Direction, float Speed, float DeltaTime);
+
+	static float DegreesToRadians(float Degrees);
+	static float RadiansToDegrees(float Radians);
+	static float AngleFromVector2(FMyVector2 v);
+	static FMyVector2 Vector2FromAngle(float Radians);
+	static FMyVector3 ForwardFromYawPitch(float YawRadians, float PitchRadians);
+	static FMyVector3 CrossProduct(FMyVector3 a, FMyVector3 b);
+
+
+
+
+
+
+
 };

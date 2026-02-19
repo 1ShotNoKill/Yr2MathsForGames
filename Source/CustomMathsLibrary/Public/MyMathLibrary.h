@@ -23,6 +23,9 @@ public:
 	MyMathLibrary();
 	~MyMathLibrary();
 
+	FMyVector2 ConvertToCustomVector2D(FVector2D a);
+	FVector2D ConvertFromCustomVector2D(FMyVector2 a);
+
 	/*2D Vector*/
 	static FMyVector2 Add2D(FMyVector2 a, FMyVector2 b);
 	static FMyVector2 Subtract2D(FMyVector2 a, FMyVector2 b);

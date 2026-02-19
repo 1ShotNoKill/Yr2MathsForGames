@@ -8,7 +8,9 @@
 #include "InputAction.h"
 #include "InputActionValue.h"
 #include "InputMappingContext.h"
-
+#include <Camera/CameraComponent.h>
+#include <GameFramework/SpringArmComponent.h>
+#include <ShipController.h>
 
 
 #include "Ship_Character.generated.h"
@@ -29,6 +31,17 @@ protected:
 	UInputMappingContext* ShipMappingContext;
 	UPROPERTY()
 	TMap<FName,const UInputAction*> InputActions;
+	UPROPERTY()
+	UStaticMeshComponent* StaticMeshComponent;
+	UPROPERTY()
+	UCameraComponent* Camera;
+	UPROPERTY()
+	USpringArmComponent* SpringArm;
+	UPROPERTY()
+	AShipController* Controller;
+
+	void Look(const FInputActionValue& Value);
+	void Move(const FInputActionValue& Value);
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;

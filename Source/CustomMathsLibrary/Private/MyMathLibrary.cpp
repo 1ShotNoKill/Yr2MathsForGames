@@ -11,6 +11,17 @@ MyMathLibrary::~MyMathLibrary()
 {
 }
 
+FMyVector2 MyMathLibrary::ConvertToCustomVector2D(FVector2D a)
+{
+	return FMyVector2(a.X, a.Y);
+}
+
+FVector2D MyMathLibrary::ConvertFromCustomVector2D(FMyVector2 a)
+{
+	return FVector2d(a.x, a.y);
+}
+
+
 FMyVector2 MyMathLibrary::Add2D(FMyVector2 a, FMyVector2 b)
 {
 	return FMyVector2((a.x+b.x),(a.y+b.y));

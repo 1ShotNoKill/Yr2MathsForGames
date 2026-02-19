@@ -2,6 +2,8 @@
 
 
 #include "ShipController.h"
+#include "MyMathLibrary.h"
+
 
 AShipController::AShipController()
 {
@@ -10,9 +12,20 @@ AShipController::AShipController()
 
 void AShipController::Tick(float DeltaTime)
 {
-	yawDeg += LookInput.x * lookSensitivity;
+}
 
-	pitchDeg -= lookInput.y * lookSensitivity;
+void AShipController::Update()
+{
+	yawDeg += LookInput.x * LookSens;
+	pitchDeg -= LookInput.y * LookSens;
+	pitchDeg = FMath::Clamp(pitchDeg, -PitchClamp, PitchClamp);
 
-	pitchDeg = Mathf.Clamp(pitchDeg, -pitchClamp, pitchClamp);
+
+	float YawRadians = MyMathLibrary::DegreesToRadians(yawDeg);
+	float PitchRadians = MyMathLibrary::DegreesToRadians(pitchDeg);
+
+	FMyVector2 YawVector = MyMathLibrary::Vector2FromAngle(YawRadians);
+	FMyVector2 PitchVector = MyMathLibrary::Vector2FromAngle(PitchRadians);
+
+	FMyVector3 ForwardVector = MyMathLibrary::ForwardFromYawPitch(YawRadians, PitchRadians);
 }

@@ -37,7 +37,6 @@ protected:
 	UCameraComponent* Camera;
 	UPROPERTY()
 	USpringArmComponent* SpringArm;
-	UPROPERTY()
 	AShipController* Controller;
 
 	void Look(const FInputActionValue& Value);

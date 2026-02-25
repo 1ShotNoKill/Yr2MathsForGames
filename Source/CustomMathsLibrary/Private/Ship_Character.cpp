@@ -13,19 +13,27 @@ AShip_Character::AShip_Character()
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	SetDefaults();
+}
+
+void AShip_Character::SetDefaults() 
+{
 	StaticMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
-	
-	UStaticMesh* LoadedMesh = LoadObject<UStaticMesh>(nullptr, TEXT("/Game/Models/Boat.Boat"));
-	if (LoadedMesh) StaticMeshComponent->SetStaticMesh(LoadedMesh);
+		StaticMeshComponent->SetRelativeRotation(FRotator(0, 90, 0));
+		if(RootComponent) StaticMeshComponent->SetupAttachment(RootComponent);
+		
+		UStaticMesh* LoadedMesh = LoadObject<UStaticMesh>(nullptr, TEXT("/Game/Models/Boat.Boat"));
+			if (LoadedMesh) StaticMeshComponent->SetStaticMesh(LoadedMesh);
 
 	SpringArm = CreateDefaultSubobject<USpringArmComponent>("SpringArm");
-	if (RootComponent) SpringArm->SetupAttachment(RootComponent);
+		if (RootComponent) SpringArm->SetupAttachment(StaticMeshComponent);
+		SpringArm->SetRelativeRotation(FRotator(0, -90, 0));
+		SpringArm->TargetArmLength = 200.f;
+
 
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
-	Camera->SetupAttachment(SpringArm);
+		Camera->SetupAttachment(SpringArm);
 
-	SpringArm->TargetArmLength = 200.f;
-	
 	ShipMappingContext = LoadObject<UInputMappingContext>(nullptr, TEXT("/Game/Player/Inputs/PlayerContext_IMC.PlayerContext_IMC"));
 }
 
@@ -41,27 +49,38 @@ void AShip_Character::BeginPlay()
 			Subsystem->AddMappingContext(ShipMappingContext, 0);
 	}
 
-	Controller = GetController<AShipController>();
+	ShipController = GetController<AShipController>();
 }
 
 void AShip_Character::Look(const FInputActionValue& Value)
 {
-	UE_LOG(LogTemp, Warning, TEXT("Look"));
-	FVector2D InputValue = Value.Get<FVector2D>();
-	Controller->MoveInput = FMyVector2(InputValue.X, InputValue.Y);
+	FVector2D Vector2D = Value.Get<FVector2D>();
+	FMyVector2 ConvertedVector2D = FMyVector2(Vector2D.X, Vector2D.Y);
+	ShipController->Look(ConvertedVector2D);
+
+	FRotator Newrot = FRotator(ShipController->pitchDeg, ShipController->yawDeg,0.f);
+
+	SetActorRotation(Newrot);
+
+	
 }
 
 void AShip_Character::Move(const FInputActionValue& Value)
 {
-	UE_LOG(LogTemp, Warning, TEXT("Move"));
-	FVector2D InputValue = Value.Get<FVector2D>();
-	Controller->LookInput = FMyVector2(InputValue.X, InputValue.Y);
+	FVector2D Vector2D = Value.Get<FVector2D>();
+	FMyVector2 ConvertedVector2D = FMyVector2(Vector2D.X, Vector2D.Y);
+	ShipController->Move(ConvertedVector2D);
+
+	AddActorWorldOffset(MyMathLibrary::ConvertFromCustomVector(ShipController->StepMovement), true);
 }
 
 // Called every frame
 void AShip_Character::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+
+
 }
 
 // Called to bind functionality to input

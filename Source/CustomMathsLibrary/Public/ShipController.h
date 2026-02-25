@@ -19,9 +19,9 @@ class CUSTOMMATHSLIBRARY_API AShipController : public APlayerController
 
 public:
 	UPROPERTY(EditAnywhere, Category = "Tuning");
-	float MoveSpeed = 5.f;
+	float MoveSpeed = 20.f;
 	UPROPERTY(EditAnywhere, Category = "Tuning");
-	float LookSens = 0.15f;
+	float LookSens = 0.5f;
 	UPROPERTY(EditAnywhere, Category = "Tuning");
 	float PitchClamp = 80.f;
 
@@ -30,8 +30,12 @@ public:
 	FMyVector2 LookInput; //Mouse Delta
 	float yawDeg;
 	float pitchDeg;
+	FMyVector3 StepMovement;
 
 
+
+	void Look(const FMyVector2 Value);
+	void Move(const FMyVector2 Value);
 	virtual void Tick(float DeltaTime) override;
-	void Update();
+	void Update(float DeltaTime);
 };

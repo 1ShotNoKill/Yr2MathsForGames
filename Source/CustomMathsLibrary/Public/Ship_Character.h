@@ -37,7 +37,11 @@ protected:
 	UCameraComponent* Camera;
 	UPROPERTY()
 	USpringArmComponent* SpringArm;
-	AShipController* Controller;
+	UPROPERTY();
+	AShipController* ShipController;
+
+
+	void SetDefaults();
 
 	void Look(const FInputActionValue& Value);
 	void Move(const FInputActionValue& Value);

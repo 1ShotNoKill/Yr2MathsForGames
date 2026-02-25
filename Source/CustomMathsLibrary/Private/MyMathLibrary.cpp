@@ -107,12 +107,12 @@ FMyVector3 MyMathLibrary::MoveStep(FMyVector3 Direction, float Speed, float Delt
 
 float MyMathLibrary::DegreesToRadians(float Degrees)
 {
-	return (Degrees * (PI * 180));
+	return Degrees * (PI / 180);
 }
 
 float MyMathLibrary::RadiansToDegrees(float Radians)
 {
-	return (Radians * (180/PI));
+	return Radians * (180/PI);
 }
 
 float MyMathLibrary::AngleFromVector2(FMyVector2 v)
@@ -129,9 +129,11 @@ FMyVector2 MyMathLibrary::Vector2FromAngle(float Radians)
 
 FMyVector3 MyMathLibrary::ForwardFromYawPitch(float YawRadians, float PitchRadians)
 {
-	float Fx = sin(YawRadians) * cos(PitchRadians);
-	float Fy = sin(PitchRadians);
-	float Fz = cos(YawRadians) * cos(PitchRadians);
+	
+	float Fx = cos(PitchRadians) * cos(YawRadians);
+	float Fy = sin(YawRadians) * cos(PitchRadians);
+	float Fz = sin(PitchRadians);
+
 		return FMyVector3(Fx,Fy,Fz);
 }
 

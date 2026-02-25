@@ -37,5 +37,4 @@ public:
 	void Look(const FMyVector2 Value);
 	void Move(const FMyVector2 Value);
 	virtual void Tick(float DeltaTime) override;
-	void Update(float DeltaTime);
 };

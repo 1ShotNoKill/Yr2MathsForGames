@@ -14,6 +14,7 @@ AShip_Character::AShip_Character()
 	PrimaryActorTick.bCanEverTick = true;
 
 	SetDefaults();
+	bUseControllerRotationYaw = false;
 }
 
 void AShip_Character::SetDefaults() 
@@ -59,7 +60,6 @@ void AShip_Character::Look(const FInputActionValue& Value)
 	ShipController->Look(ConvertedVector2D);
 
 	FRotator Newrot = FRotator(ShipController->pitchDeg, ShipController->yawDeg,0.f);
-
 	SetActorRotation(Newrot);
 
 	

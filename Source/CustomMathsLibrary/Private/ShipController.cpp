@@ -31,13 +31,16 @@ void AShipController::Move(const FMyVector2 Value)
 	float YawRadians = MyMathLibrary::DegreesToRadians(yawDeg);
 	float PitchRadians = MyMathLibrary::DegreesToRadians(pitchDeg);
 
-	FMyVector3 ForwardVector = MyMathLibrary::ForwardFromYawPitch(YawRadians, PitchRadians);
+	UpVector = FMyVector3(0, 0, 1);
+
+
+	ForwardVector = MyMathLibrary::ForwardFromYawPitch(YawRadians, PitchRadians);
 	ForwardVector.z = 0;
 	ForwardVector = MyMathLibrary::Normalize(ForwardVector);
 
 	//UE_LOG(LogTemp, Warning, TEXT("Forward : %f, %f, %f"),ForwardVector.x, ForwardVector.y, ForwardVector.z);
 
-	FMyVector3 RightVector = (MyMathLibrary::CrossProduct(FMyVector3(0, 0, 1), ForwardVector));
+	RightVector = (MyMathLibrary::CrossProduct(FMyVector3(UpVector), ForwardVector));
 	RightVector = MyMathLibrary::Normalize(RightVector);
 	//UE_LOG(LogTemp, Warning, TEXT("Right: %f, %f, %f"), RightVector.x, RightVector.y, RightVector.z);
 

@@ -53,10 +53,6 @@ public:
 	static FMyVector3 ForwardFromYawPitch(float YawRadians, float PitchRadians);
 	static FMyVector3 CrossProduct(FMyVector3 a, FMyVector3 b);
 
-
-
-
-
-
-
+	static FMyVector3 DirectionFromBasis(FMyVector3 localDir, FMyVector3 R, FMyVector3 U, FMyVector3 F);
+	static FMyVector3 LocalPointToWorldPoint(FMyVector3 P, FMyVector3 localPoint, FMyVector3 R, FMyVector3 U, FMyVector3 F);
 };

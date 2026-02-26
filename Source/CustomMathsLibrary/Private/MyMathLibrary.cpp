@@ -151,9 +151,7 @@ FMyVector3 MyMathLibrary::CrossProduct(FMyVector3 a, FMyVector3 b)
 	return FMyVector3(Cx,Cy,Cz);
 }
 
-
-
-FMyVector3 DirectionFromBasis(FMyVector3 localDir, FMyVector3 R, FMyVector3 U, FMyVector3 F)
+FMyVector3 MyMathLibrary::DirectionFromBasis(FMyVector3 localDir, FMyVector3 R, FMyVector3 U, FMyVector3 F)
 {
 	FMyVector3 Xr = MyMathLibrary::Scale(R,localDir.x);
 	FMyVector3 Xu = MyMathLibrary::Scale(U, localDir.y);
@@ -165,7 +163,7 @@ FMyVector3 DirectionFromBasis(FMyVector3 localDir, FMyVector3 R, FMyVector3 U, F
 }
 
 
-FMyVector3 LocalPointToWorldPoint(FMyVector3 P, FMyVector3 localPoint, FMyVector3 R, FMyVector3 U, FMyVector3 F)
+FMyVector3 MyMathLibrary::LocalPointToWorldPoint(FMyVector3 P, FMyVector3 localPoint, FMyVector3 R, FMyVector3 U, FMyVector3 F)
 {
 	FMyVector3 DFB = DirectionFromBasis(localPoint, R, U, F);
 	FMyVector3 LPtoWP = MyMathLibrary::Add3D(DFB, P);

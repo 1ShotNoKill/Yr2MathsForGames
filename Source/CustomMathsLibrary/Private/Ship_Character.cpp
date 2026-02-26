@@ -38,6 +38,11 @@ void AShip_Character::SetDefaults()
 	ShipMappingContext = LoadObject<UInputMappingContext>(nullptr, TEXT("/Game/Player/Inputs/PlayerContext_IMC.PlayerContext_IMC"));
 }
 
+AShipController* AShip_Character::CustomGetController()
+{
+	return Cast<AShipController>(GetController());
+}
+
 // Called when the game starts or when spawned
 void AShip_Character::BeginPlay()
 {
@@ -73,6 +78,9 @@ void AShip_Character::Move(const FInputActionValue& Value)
 
 	AddActorWorldOffset(MyMathLibrary::ConvertFromCustomVector(ShipController->StepMovement), true);
 }
+
+
+
 
 // Called every frame
 void AShip_Character::Tick(float DeltaTime)
@@ -112,7 +120,5 @@ void AShip_Character::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 			if (InputActions.Contains("Move_IA")) EnhancedInputComponent->BindAction(InputActions["Move_IA"], ETriggerEvent::Triggered, this, &AShip_Character::Move);
 		}
 	}
-
-
 }
 

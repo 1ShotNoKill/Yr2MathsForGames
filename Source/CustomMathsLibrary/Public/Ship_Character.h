@@ -24,6 +24,8 @@ public:
 	// Sets default values for this character's properties
 	AShip_Character();
 
+	AShipController* CustomGetController();
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -42,6 +44,7 @@ protected:
 
 
 	void SetDefaults();
+	
 
 	void Look(const FInputActionValue& Value);
 	void Move(const FInputActionValue& Value);

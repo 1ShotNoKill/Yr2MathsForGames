@@ -32,7 +32,9 @@ public:
 	float pitchDeg;
 	FMyVector3 StepMovement;
 
-
+	FMyVector3 RightVector;
+	FMyVector3 UpVector;
+	FMyVector3 ForwardVector;
 
 	void Look(const FMyVector2 Value);
 	void Move(const FMyVector2 Value);

@@ -108,7 +108,7 @@ FMyVector3 MyMathLibrary::MoveStep(FMyVector3 Direction, float Speed, float Delt
 {
 	FMyVector3 Dir = Normalize(Direction);
 	FMyVector3 Vel = Scale(Dir, Speed); //units per second
-	return FMyVector3(Scale(Vel,DeltaTime)); //units per frame
+	return FMyVector3(Scale(Vel, DeltaTime)); //units per frame
 }
 
 float MyMathLibrary::DegreesToRadians(float Degrees)
@@ -168,6 +168,39 @@ FMyVector3 MyMathLibrary::LocalPointToWorldPoint(FMyVector3 P, FMyVector3 localP
 	FMyVector3 DFB = DirectionFromBasis(localPoint, R, U, F);
 	FMyVector3 LPtoWP = MyMathLibrary::Add3D(DFB, P);
 	return LPtoWP;
+}
+
+FRotator MyMathLibrary::AddRotation(FRotator A, FRotator B)
+{
+	float Pitch = A.Pitch + B.Pitch;
+	float Yaw = A.Yaw + B.Yaw;
+	float Roll = A.Roll + B.Roll;
+		return FRotator(Pitch,Yaw,Roll);
+}
+
+FRotator MyMathLibrary::SubtractRotation(FRotator A, FRotator B)
+{
+	float Pitch = A.Pitch - B.Pitch;
+	float Yaw = A.Yaw - B.Yaw;
+	float Roll = A.Roll - B.Roll;
+	return FRotator(Pitch, Yaw, Roll);
+}
+
+
+
+
+FRotator MyMathLibrary::LinearRotatorLerp(FRotator CurrentRotation, FRotator TargetRotation, float Speed, float DeltaTime)
+{
+	// A + (B-A) * T * T
+	// CurrentRoation + (TargetRotation - CurrentRoation) * ((Speed * DeltaTime)* (Speed * DeltaTime)
+
+
+	FRotator DeltaRot = MyMathLibrary::SubtractRotation(TargetRotation, CurrentRotation).GetNormalized(); //Temp Normalize
+	float MaxStep = (Speed * DeltaTime); //calculate speed per frame
+	
+	FRotator Step = CurrentRotation + DeltaRot * MaxStep;
+
+	return Step;
 }
 
 

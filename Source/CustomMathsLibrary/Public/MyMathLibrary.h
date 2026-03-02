@@ -17,6 +17,13 @@ struct FMyVector3
 	float z;
 };
 
+struct FMyRotator 
+{
+	float Pitch;
+	float Yaw;
+	float Roll;
+};
+
 class CUSTOMMATHSLIBRARY_API MyMathLibrary
 {
 public:
@@ -55,4 +62,11 @@ public:
 
 	static FMyVector3 DirectionFromBasis(FMyVector3 localDir, FMyVector3 R, FMyVector3 U, FMyVector3 F);
 	static FMyVector3 LocalPointToWorldPoint(FMyVector3 P, FMyVector3 localPoint, FMyVector3 R, FMyVector3 U, FMyVector3 F);
+
+
+	static FRotator AddRotation(FRotator A, FRotator B);
+	static FRotator SubtractRotation(FRotator A, FRotator B);
+
+
+	static FRotator LinearRotatorLerp(FRotator CurrentRotation, FRotator TargetRotation, float Speed, float DeltaTime);
 };

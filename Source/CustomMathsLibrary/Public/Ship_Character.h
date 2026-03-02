@@ -15,6 +15,8 @@
 
 #include "Ship_Character.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnShotTurret, const FInputActionValue&, Value);
+
 UCLASS()
 class CUSTOMMATHSLIBRARY_API AShip_Character : public ACharacter
 {
@@ -26,6 +28,16 @@ public:
 
 	AShipController* CustomGetController();
 
+	UPROPERTY(VisibleAnywhere)
+	UCameraComponent* Camera;
+
+	UPROPERTY(BlueprintAssignable)
+	FOnShotTurret OnShot;
+
+
+	float ShipSpeed = 40.f;
+	float RotationSpeed = 2.f;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -35,10 +47,10 @@ protected:
 	TMap<FName,const UInputAction*> InputActions;
 	UPROPERTY()
 	UStaticMeshComponent* StaticMeshComponent;
-	UPROPERTY()
-	UCameraComponent* Camera;
-	UPROPERTY()
+
+	UPROPERTY(VisibleAnywhere)
 	USpringArmComponent* SpringArm;
+
 	UPROPERTY();
 	AShipController* ShipController;
 
@@ -48,6 +60,8 @@ protected:
 
 	void Look(const FInputActionValue& Value);
 	void Move(const FInputActionValue& Value);
+	UFUNCTION()
+	void Shoot(const FInputActionValue& Value);
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;

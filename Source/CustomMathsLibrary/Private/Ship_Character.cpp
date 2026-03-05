@@ -5,8 +5,7 @@
 #include "Ship_Character.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
-
-
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 AShip_Character::AShip_Character()
@@ -60,7 +59,6 @@ void AShip_Character::BeginPlay()
 	}
 
 	ShipController = GetController<AShipController>();
-	OnShot.AddDynamic(this, &AShip_Character::Shoot);
 }
 
 void AShip_Character::Look(const FInputActionValue& Value)
@@ -127,7 +125,6 @@ void AShip_Character::Move(const FInputActionValue& Value)
 
 void AShip_Character::Shoot(const FInputActionValue& Value)
 {
-	OnShot.Broadcast(Value);
 }
 
 // Called every frame

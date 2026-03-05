@@ -19,7 +19,11 @@ public:
 	ATurret();
 	FMyVector3 LocalOffset;
 
-
+	UFUNCTION()
+	void TurretShoot(const FInputActionValue& Value);
+	FMyVector3 PosOffset = FMyVector3(0,0,0);
+	FString TurretBase = "/Game/Models/TurretBase.TurretBase";
+	FString TurretBarrel = "/Game/Models/TurretBarrel.TurretBarrel";
 
 	
 	UPROPERTY(EditAnywhere)
@@ -27,8 +31,6 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-	UFUNCTION()
-	void TurretShoot(const FInputActionValue& Value);
 
 	AShipController* ShipController;
 	UPROPERTY()
@@ -36,6 +38,8 @@ protected:
 
 	UPROPERTY(EditAnywhere)
 	UStaticMeshComponent* Mesh;
+	UPROPERTY()
+	UStaticMeshComponent* Barrel;
 	UPROPERTY(EditAnywhere)
 	USceneComponent* Root;
 

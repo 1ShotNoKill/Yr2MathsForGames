@@ -12,10 +12,7 @@
 #include <GameFramework/SpringArmComponent.h>
 #include <ShipController.h>
 
-
 #include "Ship_Character.generated.h"
-
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnShotTurret, const FInputActionValue&, Value);
 
 UCLASS()
 class CUSTOMMATHSLIBRARY_API AShip_Character : public ACharacter
@@ -30,9 +27,6 @@ public:
 
 	UPROPERTY(VisibleAnywhere)
 	UCameraComponent* Camera;
-
-	UPROPERTY(BlueprintAssignable)
-	FOnShotTurret OnShot;
 
 
 	float ShipSpeed = 40.f;
@@ -53,7 +47,6 @@ protected:
 
 	UPROPERTY();
 	AShipController* ShipController;
-
 
 	void SetDefaults();
 	

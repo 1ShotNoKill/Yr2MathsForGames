@@ -17,15 +17,18 @@ ATurret::ATurret()
 	Root = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
 	if(RootComponent) RootComponent = Root;
 
-	Mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("TurretMesh"));
+		Mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("TurretMesh"));
 	if(Root) Mesh->SetupAttachment(Root);
-	Mesh->SetStaticMesh(LoadObject<UStaticMesh>(nullptr,TEXT("/Game/Models/Turret.Turret")));
-	Mesh->SetRelativeRotation(FRotator(0, 180, 0));
-	Mesh->SetRelativeLocation(FVector(0, 0, 0));
-	Mesh->SetWorldScale3D(FVector(0.5, 0.5, 0.5));
+		Mesh->SetStaticMesh(LoadObject<UStaticMesh>(nullptr,*TurretBase));
+		Mesh->SetRelativeRotation(FRotator(0, 180, 0));
+		Mesh->SetRelativeLocation(FVector(0, 0, 0));
+		Mesh->SetWorldScale3D(FVector(0.5, 0.5, 0.5));
+		Mesh->SetCollisionProfileName(FName(TEXT("NoCollision")));
 
-	Mesh->SetCollisionProfileName(FName(TEXT("NoCollision")));
-	
+	Barrel = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("TurretBarrel"));
+	Barrel->SetStaticMesh(LoadObject<UStaticMesh>(nullptr, *TurretBarrel));
+	Barrel->SetupAttachment(Mesh);
+	Barrel->SetCollisionProfileName(FName(TEXT("NoCollision")));
 }
 
 // Called when the game starts or when spawned
@@ -38,8 +41,6 @@ void ATurret::BeginPlay()
 
 	PlayerShip = Cast<AShip_Character>(FoundActors[0]);
 	ShipController = PlayerShip->CustomGetController();
-
-	if(PlayerShip)PlayerShip->OnShot.AddDynamic(this, &ATurret::TurretShoot);
 
 }
 
@@ -59,7 +60,7 @@ void ATurret::Tick(float DeltaTime)
 		FMyVector3 U = ShipController->UpVector;
 		FMyVector3 F = ShipController->ForwardVector;
 
-		FMyVector3 P = MyMathLibrary::ConvertToCustomVector(PlayerShip->GetActorLocation());
+		FMyVector3 P = MyMathLibrary::ConvertToCustomVector(PlayerShip->GetActorLocation()+ MyMathLibrary::ConvertFromCustomVector(PosOffset));
 
 		FMyVector3 DFB = MyMathLibrary::DirectionFromBasis(LocalOffset, R, U, F);
 
@@ -74,8 +75,16 @@ void ATurret::Tick(float DeltaTime)
 		float OffsetRotationSpeed = BaseTurretRotationSpeed;
 
 		FRotator RotStep = MyMathLibrary::LinearRotatorLerp(GetActorRotation(), TargetRotation, OffsetRotationSpeed, GetWorld()->DeltaRealTimeSeconds);
-
 		SetActorRotation(RotStep);
+
+		float BarrelPitch = PlayerShip->Camera->GetComponentRotation().Pitch;
+		UE_LOG(LogTemp, Warning, TEXT("Before Clamp: %f"), BarrelPitch);
+		BarrelPitch = MyMathLibrary::ClampInRange(BarrelPitch, -10, 40);
+		UE_LOG(LogTemp, Warning, TEXT("After Clamp: %f"), BarrelPitch);
+		FRotator BarrelRotation = FRotator(BarrelPitch*-1, Mesh->GetComponentRotation().Yaw, Mesh->GetComponentRotation().Roll);
+
+
+		Barrel->SetWorldRotation(BarrelRotation, false);
 
 		
 	}

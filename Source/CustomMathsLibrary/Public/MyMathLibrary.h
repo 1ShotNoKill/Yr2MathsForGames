@@ -69,4 +69,5 @@ public:
 
 
 	static FRotator LinearRotatorLerp(FRotator CurrentRotation, FRotator TargetRotation, float Speed, float DeltaTime);
+	static float ClampInRange(float Value, float MinValue, float MaxValue);
 };

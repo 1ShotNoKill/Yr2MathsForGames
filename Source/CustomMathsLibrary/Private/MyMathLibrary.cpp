@@ -200,8 +200,17 @@ FRotator MyMathLibrary::LinearRotatorLerp(FRotator CurrentRotation, FRotator Tar
 	
 	FRotator Step = CurrentRotation + DeltaRot * MaxStep;
 
-	return Step;
+		return Step;
 }
+
+float MyMathLibrary::ClampInRange(float Value, float MinValue, float MaxValue)
+{
+	float LocalValue = Value;
+	if (Value < MinValue) LocalValue = MinValue;
+	else if (Value > MaxValue) LocalValue = MaxValue;
+		return LocalValue;
+}
+
 
 
 

@@ -12,7 +12,18 @@
 #include <GameFramework/SpringArmComponent.h>
 #include <ShipController.h>
 
+
 #include "Ship_Character.generated.h"
+
+class ATurret;
+
+UENUM(BlueprintType)
+enum class ETurretType:uint8
+{
+	AllTurrets = 0,
+	MainTurret = 1,
+	GunTurret
+};
 
 UCLASS()
 class CUSTOMMATHSLIBRARY_API AShip_Character : public ACharacter
@@ -48,18 +59,24 @@ protected:
 	UPROPERTY();
 	AShipController* ShipController;
 
+	TMap<ETurretType,TArray<ATurret*>> ShipTurrets;
+	
+	UPROPERTY(EditAnywhere)
+	ETurretType SelectedTurretType;
+
 	void SetDefaults();
 	
 
 	void Look(const FInputActionValue& Value);
 	void Move(const FInputActionValue& Value);
+	void SelectTurret(const FInputActionValue& Value);
 	UFUNCTION()
-	void Shoot(const FInputActionValue& Value);
+	void Shoot();
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-
+	bool bCanSwitch = true;
 };

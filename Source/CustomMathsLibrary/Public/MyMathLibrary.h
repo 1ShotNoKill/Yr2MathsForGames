@@ -66,6 +66,7 @@ public:
 
 	static FRotator AddRotation(FRotator A, FRotator B);
 	static FRotator SubtractRotation(FRotator A, FRotator B);
+	static FRotator MultiplyRotation(FRotator A, float B);
 
 
 	static FRotator LinearRotatorLerp(FRotator CurrentRotation, FRotator TargetRotation, float Speed, float DeltaTime);

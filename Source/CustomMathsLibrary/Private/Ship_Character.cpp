@@ -6,6 +6,8 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "Kismet/GameplayStatics.h"
+#include "Turret.h"
+#include "SmallTurret.h"
 
 // Sets default values
 AShip_Character::AShip_Character()
@@ -19,6 +21,7 @@ AShip_Character::AShip_Character()
 
 void AShip_Character::SetDefaults() 
 {
+	/*Ship Mesh*/
 	StaticMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
 		StaticMeshComponent->SetRelativeRotation(FRotator(0, 90, 0));
 		StaticMeshComponent->SetRelativeLocation(FVector(0, 0, -10));
@@ -26,18 +29,19 @@ void AShip_Character::SetDefaults()
 		
 		UStaticMesh* LoadedMesh = LoadObject<UStaticMesh>(nullptr, TEXT("/Game/Models/Boat.Boat"));
 			if (LoadedMesh) StaticMeshComponent->SetStaticMesh(LoadedMesh);
-
+	/*CameraSpringArm*/
 	SpringArm = CreateDefaultSubobject<USpringArmComponent>("SpringArm");
 		if (RootComponent) SpringArm->SetupAttachment(StaticMeshComponent);
 		SpringArm->SetRelativeLocation(FVector(0, 0, 92.563689));
 		SpringArm->SetRelativeRotation(FRotator(-20, -90, 0));
 		SpringArm->TargetArmLength = 200.f;
 
-
+	/*Camera*/
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 		Camera->SetupAttachment(SpringArm);
 		SpringArm->bDoCollisionTest = false;
 
+	/*Load PlayerInputContext*/
 	ShipMappingContext = LoadObject<UInputMappingContext>(nullptr, TEXT("/Game/Player/Inputs/PlayerContext_IMC.PlayerContext_IMC"));
 }
 
@@ -53,12 +57,44 @@ void AShip_Character::BeginPlay()
 
 	if (APlayerController* PlayerController = Cast<APlayerController>(Controller))
 	{
-		//check if localplayer is using enhanced input subsystem
-		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
-			Subsystem->AddMappingContext(ShipMappingContext, 0);
 	}
 
 	ShipController = GetController<AShipController>();
+
+	/*Spawn Main Turret in world*/
+	ATurret* MainTurret = GetWorld()->SpawnActor<ATurret>(ATurret::StaticClass(), GetActorTransform());
+		MainTurret->SetShipCharacterReference(this);
+		MainTurret->LocalOffset = FMyVector3(0, 40, 0);
+
+		if (ShipTurrets.Contains(ETurretType::MainTurret))
+		{
+			ShipTurrets[ETurretType::MainTurret].Add(MainTurret);
+			UE_LOG(LogTemp, Warning, TEXT("Added MainTurret To Array"));
+			UE_LOG(LogTemp, Warning, TEXT("Added Turret, if"));
+		}
+		else
+		{
+			ShipTurrets.Add(ETurretType::MainTurret);
+			ShipTurrets[ETurretType::MainTurret].Add(MainTurret);
+			UE_LOG(LogTemp, Warning, TEXT("Added Turret, else"));
+		}
+		
+	/*Spawns GunTurret in world*/
+	ATurret* GunTurret = GetWorld()->SpawnActor<ASmallTurret>(ASmallTurret::StaticClass(), GetActorTransform());
+		GunTurret->SetShipCharacterReference(this);
+		GunTurret->LocalOffset = FMyVector3(0, 40, 40);
+		if (ShipTurrets.Contains(ETurretType::GunTurret))
+		{
+			ShipTurrets[ETurretType::GunTurret].Add(GunTurret);
+			UE_LOG(LogTemp, Warning, TEXT("Added GunTurret To Array"));
+			UE_LOG(LogTemp, Warning, TEXT("Added Turret, if"));
+		}
+		else
+		{
+			ShipTurrets.Add(ETurretType::GunTurret);
+			ShipTurrets[ETurretType::GunTurret].Add(GunTurret);
+			UE_LOG(LogTemp, Warning, TEXT("Added Turret,else"));
+		}
 }
 
 void AShip_Character::Look(const FInputActionValue& Value)
@@ -69,10 +105,6 @@ void AShip_Character::Look(const FInputActionValue& Value)
 
 	FRotator Newrot = FRotator(ShipController->pitchDeg, ShipController->yawDeg,0.f);
 	SpringArm->SetRelativeRotation(Newrot);
-		/*SetActorRotation(Newrot);*/
-	
-
-	
 }
 
 void AShip_Character::Move(const FInputActionValue& Value)
@@ -101,30 +133,68 @@ void AShip_Character::Move(const FInputActionValue& Value)
 			   ShipController->RightVector = RightVector;
 
 			   FMyVector3 ScaledForward = MyMathLibrary::Scale(ForwardVector, Vector2D.X);
-			   //FMyVector3 ScaledRight   = MyMathLibrary::Scale(RightVector, Vector2D.Y);
-			   //FMyVector3 MoveDirection = MyMathLibrary::Add3D(ScaledRight, ScaledRight);
-						//  MoveDirection = MyMathLibrary::Normalize(MoveDirection);
 
 
 	/*Calculate the New Position using Scaled Forward Vector & ShipSpeed, multiplied by DeltaTime to ensure smooth motion*/
 	FMyVector3 MoveStep = MyMathLibrary::MoveStep(ScaledForward, ShipSpeed, GetWorld()->DeltaRealTimeSeconds);
 
-	AddActorWorldOffset(MyMathLibrary::ConvertFromCustomVector(MoveStep), true);
+
+	FMyVector3 Location = MyMathLibrary::ConvertToCustomVector(RootComponent->GetComponentLocation());
+	Location = MyMathLibrary::Add3D(Location, MoveStep);
+
+	RootComponent->SetWorldLocation(MyMathLibrary::ConvertFromCustomVector(Location));
 
 	/*Yaw Rotation*/
 	float DeltaYaw = RotationSpeed * Vector2D.Y * GetWorld()->DeltaRealTimeSeconds;
 
 	FRotator DeltaRotation = FRotator(0, DeltaYaw, 0);
-
 	FRotator NewRotation = MyMathLibrary::AddRotation(GetActorRotation(), DeltaRotation);
 
-	
-
-	SetActorRotation(NewRotation);
+	RootComponent->SetWorldRotation(NewRotation);
 }
 
-void AShip_Character::Shoot(const FInputActionValue& Value)
+void AShip_Character::SelectTurret(const FInputActionValue& Value)
 {
+	if (!bCanSwitch) return;
+	bCanSwitch = false;
+
+	float Selected = Value.Get<float>();
+	int SelectedINT = FMath::RoundToInt(Selected);
+	UE_LOG(LogTemp, Warning, TEXT("%d"), SelectedINT);
+	ETurretType NewSelection = static_cast<ETurretType>(SelectedINT);
+	if (NewSelection == SelectedTurretType)
+	{
+		NewSelection = static_cast<ETurretType>(0);
+	}
+	SelectedTurretType = NewSelection;
+
+	GetWorldTimerManager().SetTimerForNextTick([this]()
+		{
+			bCanSwitch = true;
+		});
+}
+
+//shoots turrets based on selected turret type
+void AShip_Character::Shoot()
+{
+	TArray<ATurret*> SelectedTurrets;
+	if (SelectedTurretType == ETurretType::AllTurrets) //Selects all turrets within ShipTurret map
+	{
+		for (const auto& Pair : ShipTurrets)
+		{
+			for (ATurret* Turret : Pair.Value)
+			{
+				SelectedTurrets.Add(Turret);
+			}
+		}
+	}
+	else SelectedTurrets = ShipTurrets[SelectedTurretType]; //select all turrets of a type within ShipTurret Map
+
+	for (ATurret* Turret : SelectedTurrets)
+	{
+		if(Turret) Turret->TurretShoot();
+		//UE_LOG(LogTemp, Warning, TEXT("Fired"));
+	}
 }
 
 // Called every frame
@@ -160,7 +230,10 @@ void AShip_Character::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 		{
 			if (InputActions.Contains("Look_IA")) EnhancedInputComponent->BindAction(InputActions["Look_IA"], ETriggerEvent::Triggered, this, &AShip_Character::Look);
 			if (InputActions.Contains("Move_IA")) EnhancedInputComponent->BindAction(InputActions["Move_IA"], ETriggerEvent::Triggered, this, &AShip_Character::Move);
-			if (InputActions.Contains("Shoot_IA")) EnhancedInputComponent->BindAction(InputActions["Shoot_IA"], ETriggerEvent::Started, this, &AShip_Character::Shoot);
+			if (InputActions.Contains("Shoot_IA")) EnhancedInputComponent->BindAction(InputActions["Shoot_IA"], ETriggerEvent::Triggered, this, &AShip_Character::Shoot);
+			if (InputActions.Contains("PrimaryTurretSelection_IA")) EnhancedInputComponent->BindAction(InputActions["PrimaryTurretSelection_IA"], ETriggerEvent::Started, this, &AShip_Character::SelectTurret);
+			if (InputActions.Contains("SecondaryTurretSelection_IA")) EnhancedInputComponent->BindAction(InputActions["SecondaryTurretSelection_IA"], ETriggerEvent::Started, this, &AShip_Character::SelectTurret);
+
 		}
 	}
 }

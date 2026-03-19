@@ -162,7 +162,6 @@ FMyVector3 MyMathLibrary::DirectionFromBasis(FMyVector3 localDir, FMyVector3 R, 
 	return Xruf;
 }
 
-
 FMyVector3 MyMathLibrary::LocalPointToWorldPoint(FMyVector3 P, FMyVector3 localPoint, FMyVector3 R, FMyVector3 U, FMyVector3 F)
 {
 	FMyVector3 DFB = DirectionFromBasis(localPoint, R, U, F);
@@ -186,6 +185,15 @@ FRotator MyMathLibrary::SubtractRotation(FRotator A, FRotator B)
 	return FRotator(Pitch, Yaw, Roll);
 }
 
+FRotator MyMathLibrary::MultiplyRotation(FRotator A, float B)
+{
+	float Pitch = A.Pitch* B;
+	float Yaw = A.Yaw * B;
+	float Roll = A.Roll* B;
+		return FRotator(Pitch,Yaw,Roll);
+}
+
+
 
 
 
@@ -193,12 +201,14 @@ FRotator MyMathLibrary::LinearRotatorLerp(FRotator CurrentRotation, FRotator Tar
 {
 	// A + (B-A) * T * T
 	// CurrentRoation + (TargetRotation - CurrentRoation) * ((Speed * DeltaTime)* (Speed * DeltaTime)
+	// CurrentRotation + DeltaRotation
 
 
-	FRotator DeltaRot = MyMathLibrary::SubtractRotation(TargetRotation, CurrentRotation).GetNormalized(); //Temp Normalize
-	float MaxStep = (Speed * DeltaTime); //calculate speed per frame
-	
-	FRotator Step = CurrentRotation + DeltaRot * MaxStep;
+	FRotator BA = MyMathLibrary::SubtractRotation(TargetRotation, CurrentRotation).GetNormalized(); //Temp Normalize
+	float Easing = Speed * DeltaTime;
+	FRotator BAT = BA * Easing;
+
+	FRotator Step = MyMathLibrary::AddRotation(CurrentRotation, BAT);
 
 		return Step;
 }

@@ -5,9 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "MyMathLibrary.h"
-#include "Ship_Character.h"
 #include "Turret.generated.h"
-
 
 UCLASS()
 class CUSTOMMATHSLIBRARY_API ATurret : public AActor
@@ -20,31 +18,44 @@ public:
 	FMyVector3 LocalOffset;
 
 	UFUNCTION()
-	void TurretShoot(const FInputActionValue& Value);
-	FMyVector3 PosOffset = FMyVector3(0,0,0);
-	FString TurretBase = "/Game/Models/TurretBase.TurretBase";
-	FString TurretBarrel = "/Game/Models/TurretBarrel.TurretBarrel";
+	void TurretShoot();
+	FMyVector3 PosOffset;
+	FString TurretBase;
+	FString TurretBarrel;
+	FMyVector3 ProjectileSpawnOffset;
 
-	
-	UPROPERTY(EditAnywhere)
-	float BaseTurretRotationSpeed = 1;
+
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-
-	AShipController* ShipController;
-	UPROPERTY()
-	AShip_Character* PlayerShip;
-
+	virtual void OnConstruction(const FTransform& Transform) override;
+	void ReloadTurret(float Time);
+	void SpawnProjectile();
 	UPROPERTY(EditAnywhere)
 	UStaticMeshComponent* Mesh;
+
 	UPROPERTY()
 	UStaticMeshComponent* Barrel;
+
 	UPROPERTY(EditAnywhere)
 	USceneComponent* Root;
+
+	float DegClamp = 80; //Defines Max Rotation
+	float BaseTurretRotationSpeed = 0.75; //Defines base speed at which the turret can rotate
+	int MaxCapacity = 2; //Defines Max capacity of turret before needing reload
+	int CurrentCapacity = 2; //Defines current ammo in turret
+	float ReloadTime = 5; //Defines time it takes to reload capacity
+	bool bCanFire = true;
+	float ShootCooldownTime = 1; //Defines time between shots
+	float ProjectileSpeedModifier = 1;
+
+	class AShipController* ShipController;
+	class AShip_Character* PlayerShip;
 
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	void SetShipCharacterReference(AShip_Character* OwningShip);
 };

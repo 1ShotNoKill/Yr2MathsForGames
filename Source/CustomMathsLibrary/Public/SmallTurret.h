@@ -9,15 +9,20 @@
 /**
  * 
  */
+
+
+
 UCLASS()
 class CUSTOMMATHSLIBRARY_API ASmallTurret : public ATurret
 {
 	GENERATED_BODY()
 	
 public:
-	FMyVector3 PosOffset = FMyVector3(100, 0, 0);
+	ASmallTurret();
+protected:
 
-	FString TurretBase = "/Game/Models/SmallTurretBase.SmallTurretBase";
-	FString TurretBarrel = "/Game/Models/SmallTurretBarrels.SmallTurretBarrels";
-
+private:
+	virtual void BeginPlay() override;
 };
+
+

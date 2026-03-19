@@ -2,6 +2,7 @@
 
 
 #include "MyMathLibrary.h"
+#include "Matrix4.h"
 
 MyMathLibrary::MyMathLibrary()
 {
@@ -168,6 +169,30 @@ FMyVector3 MyMathLibrary::LocalPointToWorldPoint(FMyVector3 P, FMyVector3 localP
 	FMyVector3 DFB = DirectionFromBasis(localPoint, R, U, F);
 	FMyVector3 LPtoWP = MyMathLibrary::Add3D(DFB, P);
 	return LPtoWP;
+}
+
+float MyMathLibrary::Dot4(FMyVector4 A, FMyVector4 B)
+{
+	float x = A.X * B.X;
+	float y = A.Y * B.Y;
+	float z = A.Z * A.Z;
+	float w = A.W * B.W;
+		return x+y+z+w;
+}
+
+void MyMathLibrary::BuildBasisFromForward(FMyVector3 Forward, OUT FMyVector3 R, OUT FMyVector3 U, OUT FMyVector3 F)
+{
+	F = MyMathLibrary::Normalize(Forward);
+	U = FMyVector3(0, 0, 1);
+	R = MyMathLibrary::Normalize(MyMathLibrary::CrossProduct(U, F));
+	U = MyMathLibrary::CrossProduct(F, R);
+}
+
+FMyVector3 MyMathLibrary::TransformPoint(Matrix4 M, FMyVector3 p)
+{
+	FMyVector4 V = FMyVector4(p.x, p.y, p.z, 1.f);
+	FMyVector4 OUTV = M.Multiply(V);
+		return FMyVector3(OUTV.X,OUTV.Y,OUTV.Z);
 }
 
 

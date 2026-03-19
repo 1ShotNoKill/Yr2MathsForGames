@@ -4,6 +4,8 @@
 
 #include "CoreMinimal.h"
 
+class Matrix4;
+
 struct FMyVector2
 {
 	float x;
@@ -15,6 +17,14 @@ struct FMyVector3
 	float x;
 	float y;
 	float z;
+};
+
+struct FMyVector4
+{
+	float X;
+	float Y;
+	float Z;
+	float W;
 };
 
 class CUSTOMMATHSLIBRARY_API MyMathLibrary
@@ -55,4 +65,8 @@ public:
 
 	static FMyVector3 DirectionFromBasis(FMyVector3 localDir, FMyVector3 R, FMyVector3 U, FMyVector3 F);
 	static FMyVector3 LocalPointToWorldPoint(FMyVector3 P, FMyVector3 localPoint, FMyVector3 R, FMyVector3 U, FMyVector3 F);
+
+	static float Dot4(FMyVector4 A, FMyVector4 B);
+	static void BuildBasisFromForward(FMyVector3 Forward,OUT FMyVector3 R, OUT FMyVector3 U, OUT FMyVector3 F);
+	static FMyVector3 TransformPoint(Matrix4 M, FMyVector3 p);
 };

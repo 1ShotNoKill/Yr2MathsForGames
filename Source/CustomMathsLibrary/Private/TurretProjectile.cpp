@@ -2,6 +2,8 @@
 
 
 #include "TurretProjectile.h"
+#include <Kismet/GameplayStatics.h>
+#include <ShipEnemy.h>
 
 // Sets default values
 ATurretProjectile::ATurretProjectile()
@@ -49,7 +51,42 @@ void ATurretProjectile::Tick(float DeltaTime)
 	Velocity = MyMathLibrary::Add3D(Velocity,GravityPerFrame); //applies gravity per frame to velocity
 
 
-	FMyVector3 Step = MyMathLibrary::Scale(Velocity, DeltaTime); //scale by deltatime to get movement per frame
-	SetActorLocation(MyMathLibrary::ConvertFromCustomVector(MyMathLibrary::Add3D(ActorLoc, Step))); //Add movement per frame to current position
+	FMyVector3 StepDir = MyMathLibrary::Scale(Velocity, DeltaTime); //scale by deltatime to get movement per frame
+	SetActorLocation(MyMathLibrary::ConvertFromCustomVector(MyMathLibrary::Add3D(ActorLoc, StepDir))); //Add movement per frame to current position
+
+	AActor* EnemyActor = UGameplayStatics::GetActorOfClass(GetWorld(), AShipEnemy::StaticClass());
+	if (EnemyActor)
+	{
+		float dot = DotBehind(MyMathLibrary::Normalize(Velocity), EnemyActor);
+		if (dot < -0.999)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Critical Hit! (Dot = %f)"),dot);
+		}
+	}		
 }
 
+float ATurretProjectile::DotBehind(FMyVector3 ProjectileVelocity, AActor* EnemyShip)
+{	
+
+	/*Dot checks if projectile is behind the enemy*/
+	FMyVector3 EnemyPos = MyMathLibrary::ConvertToCustomVector(EnemyShip->GetActorLocation());
+	FMyVector3 ProjectilePos = MyMathLibrary::ConvertToCustomVector(GetActorLocation());
+		FMyVector3 DirToEnemy = MyMathLibrary::Subtract3D(ProjectilePos, EnemyPos); //Get enemy to projectile vector
+		DirToEnemy = MyMathLibrary::Normalize(DirToEnemy);
+
+	FMyVector3 EnemyForward = MyMathLibrary::ConvertToCustomVector(EnemyShip->GetActorForwardVector());
+	
+	float DotBehind = MyMathLibrary::Dot(EnemyForward, DirToEnemy);
+
+	/*Second Dot Checks if projectile is heading towards enemy*/
+	if (MyMathLibrary::Dot(ProjectileVelocity, DirToEnemy) < 0)
+	{
+		return DotBehind;
+	}
+	else return 0;
+}
+
+void ATurretProjectile::OnProjectileCollide()
+{
+	/*Collision test*/
+}

@@ -23,7 +23,7 @@ public:
 	FString TurretBase;
 	FString TurretBarrel;
 	FMyVector3 ProjectileSpawnOffset;
-
+	float ProjectileSpeedModifier = 1;
 
 
 protected:
@@ -48,7 +48,7 @@ protected:
 	float ReloadTime = 5; //Defines time it takes to reload capacity
 	bool bCanFire = true;
 	float ShootCooldownTime = 1; //Defines time between shots
-	float ProjectileSpeedModifier = 1;
+	
 
 	class AShipController* ShipController;
 	class AShip_Character* PlayerShip;

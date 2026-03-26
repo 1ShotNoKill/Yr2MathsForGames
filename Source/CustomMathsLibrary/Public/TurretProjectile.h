@@ -33,7 +33,8 @@ protected:
 	void DestroyProjectile();
 	FTimerHandle TimerHandle;
 
-
+	float DotBehind(FMyVector3 ProjectileMoveDirection,AActor* EnemyShip);
+	void OnProjectileCollide();
 
 
 public:	

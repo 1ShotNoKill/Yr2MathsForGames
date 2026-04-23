@@ -11,11 +11,14 @@
 #include <Camera/CameraComponent.h>
 #include <GameFramework/SpringArmComponent.h>
 #include <ShipController.h>
+#include "BoundingBox.h"
+
 
 
 #include "Ship_Character.generated.h"
 
 class ATurret;
+class APickupActor;
 
 UENUM(BlueprintType)
 enum class ETurretType:uint8
@@ -43,6 +46,9 @@ public:
 	float ShipSpeed = 40.f;
 	float RotationSpeed = 2.f;
 
+	BoundingBox CollisionBox;
+	APickupActor* PickupActor;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -63,6 +69,12 @@ protected:
 	
 	UPROPERTY(EditAnywhere)
 	ETurretType SelectedTurretType;
+
+	UPROPERTY(EditAnywhere)
+	AActor* PowerUp;
+	float CurrentDeg = 0;
+
+	
 
 	void SetDefaults();
 	

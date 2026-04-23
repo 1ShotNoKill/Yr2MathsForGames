@@ -4,6 +4,8 @@
 
 #include "CoreMinimal.h"
 
+class MyMatrix4;
+
 struct FMyVector2
 {
 	float x;
@@ -24,14 +26,25 @@ struct FMyRotator
 	float Roll;
 };
 
+struct FMyVector4
+{
+	float x;
+	float y;
+	float z;
+	float w;
+};
+
 class CUSTOMMATHSLIBRARY_API MyMathLibrary
 {
 public:
 	MyMathLibrary();
 	~MyMathLibrary();
 
+	static float Absolute(float Value);
+
 	FMyVector2 ConvertToCustomVector2D(FVector2D a);
 	FVector2D ConvertFromCustomVector2D(FMyVector2 a);
+	
 
 	/*2D Vector*/
 	static FMyVector2 Add2D(FMyVector2 a, FMyVector2 b);
@@ -63,6 +76,12 @@ public:
 	static FMyVector3 DirectionFromBasis(FMyVector3 localDir, FMyVector3 R, FMyVector3 U, FMyVector3 F);
 	static FMyVector3 LocalPointToWorldPoint(FMyVector3 P, FMyVector3 localPoint, FMyVector3 R, FMyVector3 U, FMyVector3 F);
 
+	static float Dot4(FMyVector4 A, FMyVector4 B);
+	static void BuildBasisFromForward(const FMyVector3& Forward, FMyVector3& R, FMyVector3& U, FMyVector3& F);
+	static FMyVector3 TransformPoint(MyMatrix4 M, FMyVector3 P);
+
+	static FMyVector3 RotateAroundAxis(FMyVector3 v, FMyVector3 axis, float angleRad);
+
 
 	static FRotator AddRotation(FRotator A, FRotator B);
 	static FRotator SubtractRotation(FRotator A, FRotator B);
@@ -71,4 +90,6 @@ public:
 
 	static FRotator LinearRotatorLerp(FRotator CurrentRotation, FRotator TargetRotation, float Speed, float DeltaTime);
 	static float ClampInRange(float Value, float MinValue, float MaxValue);
+
+	static void RotateObjectAroundParent(AActor* Parent,AActor* OrbitActor, FMyVector3 OrbitOffset, FMyVector3 RotateAxis, float RotationSpeed, float DeltaTime, float& CurrentAngleDeg);
 };

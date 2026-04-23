@@ -58,7 +58,7 @@ void ATurretProjectile::Tick(float DeltaTime)
 	if (EnemyActor)
 	{
 		float dot = DotBehind(MyMathLibrary::Normalize(Velocity), EnemyActor);
-		if (dot < -0.999)
+		if (dot < -0.99)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("Critical Hit! (Dot = %f)"),dot);
 		}

@@ -8,6 +8,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Turret.h"
 #include "SmallTurret.h"
+#include "PickupActor.h"
 
 // Sets default values
 AShip_Character::AShip_Character()
@@ -95,6 +96,13 @@ void AShip_Character::BeginPlay()
 			ShipTurrets[ETurretType::GunTurret].Add(GunTurret);
 			UE_LOG(LogTemp, Warning, TEXT("Added Turret,else"));
 		}
+
+	//CreateCustomBoundingBox
+		BoundingBox Newbox(this, FMyVector3(100.f, 60.f, 75.f),FMyVector3(0,0,35),-1);
+		CollisionBox = Newbox;
+
+		PickupActor = Cast<APickupActor>(UGameplayStatics::GetActorOfClass(GetWorld(), APickupActor::StaticClass()));
+		
 }
 
 void AShip_Character::Look(const FInputActionValue& Value)
@@ -201,6 +209,31 @@ void AShip_Character::Shoot()
 void AShip_Character::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+
+	if (PowerUp)
+	{
+		MyMathLibrary::RotateObjectAroundParent(this, PowerUp, FMyVector3(100, 0, 75), FMyVector3(0, 0, 1), 85.f, DeltaTime, CurrentDeg);
+	}
+
+	
+	CollisionBox.DebugDrawBox();
+
+	//Collision Detection for powerup
+	if (PickupActor && PickupActor->BCollisionEnabled == true)
+	{
+	 FMyVector3 Overlap = CollisionBox.AABBOverlap(PickupActor->CollisionBox);
+	 if (Overlap.x > 0 && Overlap.y >0 && Overlap.z > 0)
+	 {
+		 UE_LOG(LogTemp, Warning, TEXT("Overlapped"));
+		 PickupActor->BCollisionEnabled = false;
+		 PowerUp = PickupActor; 
+	 }
+	}
+
+
+
+
 }
 
 // Called to bind functionality to input

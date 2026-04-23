@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "BoundingBox.h"
 #include "ShipEnemy.generated.h"
 
 UCLASS()
@@ -14,6 +15,7 @@ class CUSTOMMATHSLIBRARY_API AShipEnemy : public ACharacter
 public:
 	// Sets default values for this character's properties
 	AShipEnemy();
+	BoundingBox CollisionBox;
 
 protected:
 	// Called when the game starts or when spawned
@@ -21,7 +23,6 @@ protected:
 
 	UPROPERTY()
 	UStaticMeshComponent* StaticMeshComponent;
-
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;

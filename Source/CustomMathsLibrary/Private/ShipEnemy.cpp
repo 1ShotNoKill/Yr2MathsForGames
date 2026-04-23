@@ -26,13 +26,15 @@ void AShipEnemy::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	BoundingBox Box(this, FMyVector3(100.f, 60.f, 75.f), FMyVector3(0, 0, 35),-1);
+	CollisionBox = Box;
 }
 
 // Called every frame
 void AShipEnemy::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
+	CollisionBox.DebugDrawBox();
 }
 
 // Called to bind functionality to input

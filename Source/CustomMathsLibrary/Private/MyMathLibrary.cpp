@@ -2,6 +2,9 @@
 
 
 #include "MyMathLibrary.h"
+#include "MyMatrix4.h"
+#include "MyQuat.h"
+#include "BoundingBox.h"
 
 MyMathLibrary::MyMathLibrary()
 {
@@ -9,6 +12,15 @@ MyMathLibrary::MyMathLibrary()
 
 MyMathLibrary::~MyMathLibrary()
 {
+}
+
+float MyMathLibrary::Absolute(float Value)
+{
+		if (Value < 0)
+		{
+			return Value * -1;
+		}
+		return Value;
 }
 
 /*Vector 2 functions ---------------------------------------*/
@@ -21,6 +33,7 @@ FVector2D MyMathLibrary::ConvertFromCustomVector2D(FMyVector2 a)
 {
 	return FVector2d(a.x, a.y);
 }
+
 
 FMyVector2 MyMathLibrary::Add2D(FMyVector2 a, FMyVector2 b)
 {
@@ -169,6 +182,69 @@ FMyVector3 MyMathLibrary::LocalPointToWorldPoint(FMyVector3 P, FMyVector3 localP
 	return LPtoWP;
 }
 
+float MyMathLibrary::Dot4(FMyVector4 A, FMyVector4 B)
+{
+	float x = A.x * B.x;
+	float y = A.y * B.y;
+	float z = A.z * B.z;
+	float w = A.w * B.w;
+	return x + y + z + w;
+}
+
+void MyMathLibrary::BuildBasisFromForward(const FMyVector3& Forward, FMyVector3& R,FMyVector3& U, FMyVector3& F) //Pass by reference, sets variable values of R,U,F 
+{
+	F = MyMathLibrary::Normalize(Forward); //Normalise forward vector
+	U = FMyVector3(0, 0, 1); //Assumes up is world up to calculate right
+
+	R = MyMathLibrary::Normalize(MyMathLibrary::CrossProduct(U, F)); //crossing Up and Forward gives right vector
+	
+	U = MyMathLibrary::CrossProduct(F, R); //Re-set up to guarrantee orthogonality by using a calculated up instead of assumption
+}
+
+FMyVector3 MyMathLibrary::TransformPoint(MyMatrix4 M, FMyVector3 P)
+{
+	float W = 1.f; //Set W to 1 due to Point transform otherwise 0 would be calculating direction
+	FMyVector4 V = FMyVector4(P.x, P.y, P.z, W); //Pack matrix column
+	FMyVector4 OutV = M.Multiply(V);
+		return FMyVector3(OutV.x, OutV.y, OutV.z);
+}
+
+FMyVector3 MyMathLibrary::RotateAroundAxis(FMyVector3 v, FMyVector3 axis, float angleRad)
+{
+	//Normalize axis
+	FMyVector3 NAxis = MyMathLibrary::Normalize(axis);
+
+	//Trig
+	float CosT = FMath::Cos(angleRad);
+	float SinT = FMath::Sin(angleRad);
+
+
+	//Term1
+	FMyVector3 Term1 = MyMathLibrary::Scale(v, CosT);
+
+	//Term 2
+	float Dot = MyMathLibrary::Dot(v, NAxis);
+	FMyVector3 Term2 = MyMathLibrary::Scale(NAxis, Dot * (1.f - CosT));
+
+	//Term 3
+	FMyVector3 Cross = MyMathLibrary::CrossProduct(NAxis, v);
+	FMyVector3 Term3 = MyMathLibrary::Scale(Cross, SinT);
+
+	//Final Result
+	FMyVector3 Result = MyMathLibrary::Add3D(MyMathLibrary::Add3D(Term1, Term2), Term3);
+
+	return Result;
+}
+
+
+
+
+
+
+
+
+//Rotation
+
 FRotator MyMathLibrary::AddRotation(FRotator A, FRotator B)
 {
 	float Pitch = A.Pitch + B.Pitch;
@@ -192,9 +268,6 @@ FRotator MyMathLibrary::MultiplyRotation(FRotator A, float B)
 	float Roll = A.Roll* B;
 		return FRotator(Pitch,Yaw,Roll);
 }
-
-
-
 
 
 FRotator MyMathLibrary::LinearRotatorLerp(FRotator CurrentRotation, FRotator TargetRotation, float Speed, float DeltaTime)
@@ -221,6 +294,30 @@ float MyMathLibrary::ClampInRange(float Value, float MinValue, float MaxValue)
 		return LocalValue;
 }
 
+void MyMathLibrary::RotateObjectAroundParent(AActor* Parent,AActor* OrbitActor,FMyVector3 OrbitOffset,FMyVector3 RotateAxis, float RotationSpeed,float DeltaTime,float& CurrentAngleDeg)
+{
 
+	if (!OrbitActor) return;
+
+	//Step 1 Increment angle
+	CurrentAngleDeg += RotationSpeed * DeltaTime;
+
+	//Step 2 Convert To Radians
+	float AngleRad = MyMathLibrary::DegreesToRadians(CurrentAngleDeg);
+
+	//Step 3 build Quat from AxisAngle
+	MyQuat Quat(RotateAxis, AngleRad);
+
+	//Step 4 Rotate Orbit offset
+
+	FMyVector3 Offset(OrbitOffset.x, OrbitOffset.y, OrbitOffset.z);
+	FMyVector3 RotatedOffset = Quat.RotateVector(Offset);
+
+	//step 5 apply new position
+	FMyVector3 NewLocation = MyMathLibrary::Add3D(MyMathLibrary::ConvertToCustomVector(Parent->GetActorLocation()), FMyVector3(RotatedOffset.x, RotatedOffset.y, RotatedOffset.z));
+	OrbitActor->SetActorLocation(MyMathLibrary::ConvertFromCustomVector(NewLocation));
+
+	OrbitActor->SetActorRotation(Quat.ToUnrealQuat());
+}
 
 

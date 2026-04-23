@@ -12,6 +12,7 @@
 #include <GameFramework/SpringArmComponent.h>
 #include <ShipController.h>
 #include "BoundingBox.h"
+#include "ShipEnemy.h"
 
 
 
@@ -48,6 +49,7 @@ public:
 
 	BoundingBox CollisionBox;
 	APickupActor* PickupActor;
+	AShipEnemy* NearestEnemy;
 
 protected:
 	// Called when the game starts or when spawned
@@ -73,7 +75,7 @@ protected:
 	UPROPERTY(EditAnywhere)
 	AActor* PowerUp;
 	float CurrentDeg = 0;
-
+	bool BCanMoveForward = true;
 	
 
 	void SetDefaults();

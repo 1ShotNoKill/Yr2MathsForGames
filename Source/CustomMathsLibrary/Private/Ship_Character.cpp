@@ -103,6 +103,10 @@ void AShip_Character::BeginPlay()
 
 		PickupActor = Cast<APickupActor>(UGameplayStatics::GetActorOfClass(GetWorld(), APickupActor::StaticClass()));
 		
+
+		
+
+		
 }
 
 void AShip_Character::Look(const FInputActionValue& Value)
@@ -117,6 +121,8 @@ void AShip_Character::Look(const FInputActionValue& Value)
 
 void AShip_Character::Move(const FInputActionValue& Value)
 {
+	
+
 	FVector2D Vector2D = Value.Get<FVector2D>();
 	FMyVector2 ConvertedVector2D = FMyVector2(Vector2D.X, Vector2D.Y);
 
@@ -140,10 +146,15 @@ void AShip_Character::Move(const FInputActionValue& Value)
 			   RightVector = MyMathLibrary::Normalize(RightVector);
 			   ShipController->RightVector = RightVector;
 
+			   if (BCanMoveForward == false && Vector2D.X > 0)
+			   {
+				   Vector2D.X = 0;
+			   }
 			   FMyVector3 ScaledForward = MyMathLibrary::Scale(ForwardVector, Vector2D.X);
 
 
 	/*Calculate the New Position using Scaled Forward Vector & ShipSpeed, multiplied by DeltaTime to ensure smooth motion*/
+			  
 	FMyVector3 MoveStep = MyMathLibrary::MoveStep(ScaledForward, ShipSpeed, GetWorld()->DeltaRealTimeSeconds);
 
 
@@ -211,29 +222,64 @@ void AShip_Character::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 
-	if (PowerUp)
+	TArray<AActor*> Enemies;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AShipEnemy::StaticClass(), Enemies);
+
+
+	float Distance = 999999.f;
+	AActor* ClosestEnemy = nullptr;
+	FMyVector3 PlayerPos = MyMathLibrary::ConvertToCustomVector(GetActorLocation());
+
+	//Loops through all enemies to determine closest by distance
+	for (AActor* Enemy : Enemies)
 	{
-		MyMathLibrary::RotateObjectAroundParent(this, PowerUp, FMyVector3(100, 0, 75), FMyVector3(0, 0, 1), 85.f, DeltaTime, CurrentDeg);
+		FMyVector3 EnemyPos = MyMathLibrary::ConvertToCustomVector(Enemy->GetActorLocation());
+
+		if (float DistTemp = MyMathLibrary::Distance3D(EnemyPos, PlayerPos) < Distance)
+		{
+			Distance = DistTemp;
+			ClosestEnemy = Enemy;
+		}
+		
 	}
+	
+	//after determining closest, cast to that actor to access collisionbox variable
+	if (ClosestEnemy)
+	{
+		NearestEnemy = Cast<AShipEnemy>(ClosestEnemy);
+
+		//Do AABB collision test on closest enemy
+		FMyVector3 EnemyOverlap = CollisionBox.AABBOverlap(NearestEnemy->CollisionBox);
+		if (EnemyOverlap.x > 0 && EnemyOverlap.y > 0 && EnemyOverlap.z > 0)
+		{
+			BCanMoveForward = false; //if colliding with enemy stop ship
+		}
+		else if (BCanMoveForward == false)
+		{
+			BCanMoveForward = true; // else allow movement
+		}
+
+	}
+	
 
 	
 	CollisionBox.DebugDrawBox();
 
-	//Collision Detection for powerup
-	if (PickupActor && PickupActor->BCollisionEnabled == true)
-	{
-	 FMyVector3 Overlap = CollisionBox.AABBOverlap(PickupActor->CollisionBox);
-	 if (Overlap.x > 0 && Overlap.y >0 && Overlap.z > 0)
-	 {
-		 UE_LOG(LogTemp, Warning, TEXT("Overlapped"));
-		 PickupActor->BCollisionEnabled = false;
-		 PowerUp = PickupActor; 
-	 }
-	}
-
-
-
-
+		//Collision Detection for powerup
+		if (PickupActor && PickupActor->BCollisionEnabled == true)
+		{
+		 FMyVector3 Overlap = CollisionBox.AABBOverlap(PickupActor->CollisionBox);
+		 if (Overlap.x > 0 && Overlap.y >0 && Overlap.z > 0)
+		 {
+			 UE_LOG(LogTemp, Warning, TEXT("Overlapped"));
+			 PickupActor->BCollisionEnabled = false;
+			 PowerUp = PickupActor; 
+		 }
+		}
+		if (PowerUp)
+		{
+			MyMathLibrary::RotateObjectAroundParent(this, PowerUp, FMyVector3(100, 0, 75), FMyVector3(0, 0, 1), 85.f, DeltaTime, CurrentDeg);
+		}
 }
 
 // Called to bind functionality to input

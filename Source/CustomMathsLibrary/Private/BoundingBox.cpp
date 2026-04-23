@@ -35,7 +35,7 @@ FMyVector3 BoundingBox::GetExtents()
 
 void BoundingBox::DebugDrawBox()
 {
-	DrawDebugBox(Owner->GetWorld(), MyMathLibrary::ConvertFromCustomVector(GetPosition()), MyMathLibrary::ConvertFromCustomVector(GetExtents()),Owner->GetActorQuat(), FColor::Black, false, 0, 1, 1.f);
+	DrawDebugBox(Owner->GetWorld(), MyMathLibrary::ConvertFromCustomVector(GetPosition()), MyMathLibrary::ConvertFromCustomVector(GetExtents()),/*Owner->GetActorQuat(),*/ FColor::Black, false, 0, 1, 1.f);
 }
 
 FMyVector3 BoundingBox::GetDistanceBetweenBoxes(BoundingBox B)
@@ -52,9 +52,9 @@ FMyVector3 BoundingBox::AABBOverlap(BoundingBox B)
 	/*Both boxes extents are added together to create the max distance from the center before they are touching*/
 	/*then we subtract the distance from this giving the distance from both boxes (Negative value = overlap)*/
 	float XOverlap = (AExtents.x + BExtents.x) - MyMathLibrary::Absolute(Distance.x);
-	float YOverlap = (AExtents.x + BExtents.x) - MyMathLibrary::Absolute(Distance.y);
-	float ZOverlap = (AExtents.x + BExtents.x) - MyMathLibrary::Absolute(Distance.z);
-	/*UE_LOG(LogTemp, Warning, TEXT("X:%f,Y:%f,Z:%f"), XOverlap, YOverlap, ZOverlap);*/
+	float YOverlap = (AExtents.y + BExtents.y) - MyMathLibrary::Absolute(Distance.y);
+	float ZOverlap = (AExtents.z + BExtents.z) - MyMathLibrary::Absolute(Distance.z);
+	UE_LOG(LogTemp, Warning, TEXT("X:%f,Y:%f,Z:%f"), XOverlap, YOverlap, ZOverlap);	
 		return FMyVector3(XOverlap,YOverlap,ZOverlap);
 }
 
